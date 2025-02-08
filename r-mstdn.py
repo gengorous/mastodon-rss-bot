@@ -2,6 +2,7 @@ import json
 import feedparser
 import requests
 import os
+import logging
 from bs4 import BeautifulSoup  # BeautifulSoupのインポートを追加
 
 # 設定ファイルを読み込む
@@ -13,16 +14,20 @@ MASTODON_API_BASE = os.getenv("MASTODON_API_BASE", "https://mstdn.jp")  # マス
 print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 
 # 記事の投稿管理
+
+logging.basicConfig(level=logging.DEBUG)
+
 def load_posted_articles():
     """投稿済み記事のリストをファイルから読み込む"""
     try:
         with open("posted_articles.json", "r", encoding="utf-8") as f:
             return json.load(f)
-    except FileNotFoundError:
-        return []  # ファイルがない場合は空リストを返す
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []  # ファイルがない or 読み込めない場合は空リストを返す
 
 def save_posted_articles(posted_articles):
     """投稿済み記事のリストをファイルに保存する"""
+    logging.debug(f"✅ 記事URLを保存: {posted_articles}")
     with open("posted_articles.json", "w", encoding="utf-8") as f:
         json.dump(posted_articles, f, ensure_ascii=False, indent=2)
 
@@ -31,12 +36,13 @@ def check_and_update_posted_articles(article_url):
     posted_articles = load_posted_articles()
     
     if article_url in posted_articles:
-        print(f"🟡 既に投稿済みの記事: {article_url} → スキップ")
+        logging.info(f"🟡 既に投稿済みの記事: {article_url} → スキップ")
         return False  # 既に投稿済み
 
     posted_articles.append(article_url)
     save_posted_articles(posted_articles)
     return True  # 投稿 OK
+
 
 def extract_image_url(entry):
     """記事の説明やサマリーから画像URLを抽出"""
