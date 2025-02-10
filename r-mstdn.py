@@ -18,29 +18,32 @@ print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 logging.basicConfig(level=logging.DEBUG)
 POSTED_ARTICLES_FILE = "/persistent/posted_articles.json"
 def load_posted_articles():
+    """投稿済み記事のリストをファイルから読み込む"""
     try:
         with open(POSTED_ARTICLES_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-            print(f"🔍 読み込んだ投稿済み記事: {data}")
+            print(f"🔍 読み込んだ投稿済み記事: {data}")  # 🔍 デバッグログ
             return data
     except FileNotFoundError:
-        print(f"⚠️ ファイルが見つからないため新規作成: {POSTED_ARTICLES_FILE}")
-        save_posted_articles([])  # 新規作成
+        print(f"⚠️ ファイルが見つからないため、新しく作成します: {POSTED_ARTICLES_FILE}")  # 🔍 デバッグログ
+        save_posted_articles([])  # ✅ ここで新規作成
         return []
     except json.JSONDecodeError:
-        print(f"⚠️ JSONエラー。空のリストを返します: {POSTED_ARTICLES_FILE}")
+        print(f"⚠️ JSONエラー。空のリストを返します: {POSTED_ARTICLES_FILE}")  # 🔍 デバッグログ
         return []
 
 
 
 def save_posted_articles(posted_articles):
-    logging.debug(f"✅ 記事URLを保存: {posted_articles}")
+    """投稿済み記事のリストを JSON ファイルに保存"""
     try:
+        print(f"✅ 記事URLを保存: {posted_articles}")  # 🔍 ここで保存しようとしているリストを表示
         with open(POSTED_ARTICLES_FILE, "w", encoding="utf-8") as f:
             json.dump(posted_articles, f, ensure_ascii=False, indent=2)
-            print(f"✅ 保存完了: {POSTED_ARTICLES_FILE}")
+            print(f"✅ 保存完了: {POSTED_ARTICLES_FILE}")  # 🔍 ここで保存完了のログを出力
     except Exception as e:
-        print(f"❌ ファイル保存エラー: {e}")
+        print(f"❌ ファイル保存エラー: {e}")  # 🔍 例外が発生した場合にエラーを出力
+
 
 
 from urllib.parse import urlparse, urlunparse
