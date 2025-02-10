@@ -16,7 +16,7 @@ print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 # 記事の投稿管理
 
 logging.basicConfig(level=logging.DEBUG)
-
+POSTED_ARTICLES_FILE = "/persistent/posted_articles.json"
 def load_posted_articles():
     try:
         with open(POSTED_ARTICLES_FILE, "r", encoding="utf-8") as f:
