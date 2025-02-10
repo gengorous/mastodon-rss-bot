@@ -48,3 +48,4 @@ tweet-parser==1.13.2
 urllib3==2.3.0
 waitress==3.0.2
 Werkzeug==3.1.3
+Pillow==9.5.0
