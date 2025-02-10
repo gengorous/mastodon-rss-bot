@@ -18,21 +18,30 @@ print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 logging.basicConfig(level=logging.DEBUG)
 
 def load_posted_articles():
-    """投稿済み記事のリストをファイルから読み込む"""
     try:
-        with open("/persistent/posted_articles.json", "r", encoding="utf-8") as f:
+        with open(POSTED_ARTICLES_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
             print(f"🔍 読み込んだ投稿済み記事: {data}")
             return data
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []  # ファイルがない or 読み込めない場合は空リストを返す
+    except FileNotFoundError:
+        print(f"⚠️ ファイルが見つからないため新規作成: {POSTED_ARTICLES_FILE}")
+        save_posted_articles([])  # 新規作成
+        return []
+    except json.JSONDecodeError:
+        print(f"⚠️ JSONエラー。空のリストを返します: {POSTED_ARTICLES_FILE}")
+        return []
+
 
 
 def save_posted_articles(posted_articles):
-    """投稿済み記事のリストをファイルに保存する"""
     logging.debug(f"✅ 記事URLを保存: {posted_articles}")
-    with open("/persistent/posted_articles.json", "w", encoding="utf-8") as f:
-        json.dump(posted_articles, f, ensure_ascii=False, indent=2)
+    try:
+        with open(POSTED_ARTICLES_FILE, "w", encoding="utf-8") as f:
+            json.dump(posted_articles, f, ensure_ascii=False, indent=2)
+            print(f"✅ 保存完了: {POSTED_ARTICLES_FILE}")
+    except Exception as e:
+        print(f"❌ ファイル保存エラー: {e}")
+
 
 from urllib.parse import urlparse, urlunparse
 
