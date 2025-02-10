@@ -20,15 +20,18 @@ logging.basicConfig(level=logging.DEBUG)
 def load_posted_articles():
     """投稿済み記事のリストをファイルから読み込む"""
     try:
-        with open("posted_articles.json", "r", encoding="utf-8") as f:
-            return json.load(f)
+        with open("/persistent/posted_articles.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+            print(f"🔍 読み込んだ投稿済み記事: {data}")
+            return data
     except (FileNotFoundError, json.JSONDecodeError):
         return []  # ファイルがない or 読み込めない場合は空リストを返す
+
 
 def save_posted_articles(posted_articles):
     """投稿済み記事のリストをファイルに保存する"""
     logging.debug(f"✅ 記事URLを保存: {posted_articles}")
-    with open("posted_articles.json", "w", encoding="utf-8") as f:
+    with open("/persistent/posted_articles.json", "w", encoding="utf-8") as f:
         json.dump(posted_articles, f, ensure_ascii=False, indent=2)
 
 from urllib.parse import urlparse, urlunparse
@@ -42,6 +45,7 @@ def check_and_update_posted_articles(article_url):
 
     # URLを正規化
     normalized_url = normalize_url(article_url)
+    print(f"🔍 正規化されたURL: {normalized_url}")
 
     if normalized_url in posted_articles:
         print(f"🟡 既に投稿済み: {normalized_url} → スキップ")
@@ -66,6 +70,23 @@ def extract_image_url(entry):
             return img_tag["src"]
 
     return None  # 画像が見つからない場合
+    
+from PIL import Image
+import io
+
+def resize_image(image_data, max_width=1280, max_height=1280):
+    """画像を指定した最大幅・高さにリサイズ"""
+    with Image.open(io.BytesIO(image_data)) as img:
+        img.thumbnail((max_width, max_height))
+        output = io.BytesIO()
+        img.save(output, format="JPEG")
+        return output.getvalue()
+
+# リサイズ処理を追加
+response = requests.get(image_url)
+if response.status_code == 200:
+    resized_image_data = resize_image(response.content)
+    files = {"file": ("image.jpg", resized_image_data, "image/jpeg")}
 
 def fetch_latest_entry(feed_url):
     """RSSフィードから最新のエントリを取得"""
@@ -129,6 +150,7 @@ def upload_media(image_url, token):
 
         print(f"🔍 マストドンアップロードレスポンスコード: {response.status_code}")  
         print(f"🔍 マストドンレスポンス内容: {response.text}")  
+        print(f"🔍 Mastodon 投稿データ: {data}")
 
         if response.status_code == 200:
             media_id = response.json().get("id")
