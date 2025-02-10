@@ -91,11 +91,6 @@ def resize_image(image_data, max_width=1280, max_height=1280):
         img.save(output, format="JPEG")
         return output.getvalue()
 
-# リサイズ処理を追加
-response = requests.get(image_url)
-if response.status_code == 200:
-    resized_image_data = resize_image(response.content)
-    files = {"file": ("image.jpg", resized_image_data, "image/jpeg")}
 
 def fetch_latest_entry(feed_url):
     """RSSフィードから最新のエントリを取得"""
@@ -215,21 +210,32 @@ def post_to_mastodon(status, mastodon_url, token, media_id=None):
 
 
 
+# `image_url` は `fetch_latest_entry()` で取得される
 def main():
     for site in config["sites"]:
         print(f"処理中: {site['name']}")
-        entry, image_url = fetch_latest_entry(site["rss_url"])
+        
+        entry, image_url = fetch_latest_entry(site["rss_url"])  # ここで `image_url` を取得
+        
         if entry:
             # 投稿済みチェック
             if not check_and_update_posted_articles(entry.link):
                 continue  # 投稿済みならスキップ
+            
+            # 画像がある場合のみ取得＆リサイズ処理を実行
+            resized_image_data = None
+            if image_url:
+                response = requests.get(image_url)
+                if response.status_code == 200:
+                    resized_image_data = resize_image(response.content)
 
             # 新しい記事の投稿
             status = f"{site['title']}\n{entry.title}\n{entry.link}"
             media_id = None
-            if image_url:
+            if resized_image_data:
                 media_id = upload_media(image_url, site["mastodon_token"])  # 画像アップロード
             post_to_mastodon(status, site["mastodon_url"], site["mastodon_token"], media_id)
+
 
 
 if __name__ == "__main__":
