@@ -6,27 +6,30 @@ import logging
 from bs4 import BeautifulSoup  # BeautifulSoupのインポートを追加
 from google.cloud import storage
 from google.oauth2 import service_account
-
-# 環境変数から GCS の認証情報を取得（Base64 エンコードされた JSON）
-GCS_CREDENTIALS_BASE64 = os.getenv("GCS_CREDENTIALS")  # 環境変数のキーは適宜変更
-
 import base64
 
-GCS_CREDENTIALS_BASE64 = os.getenv("GCS_CREDENTIALS")
+# GCS 認証情報のロード
+GCS_CREDENTIALS = os.getenv("GCS_CREDENTIALS")
 
-if GCS_CREDENTIALS_BASE64:
+if not GCS_CREDENTIALS:
+    logging.error("❌ GCS_CREDENTIALS が設定されていません")
+    credentials = None
+else:
     try:
-        # Base64 をデコードして JSON に戻す
-        decoded_credentials = base64.b64decode(GCS_CREDENTIALS_BASE64).decode("utf-8")
+        # Base64デコードしてJSONとして解釈
+        decoded_credentials = base64.b64decode(GCS_CREDENTIALS).decode("utf-8")
         credentials_info = json.loads(decoded_credentials)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
-        logging.info("✅ GCS 認証情報をロードしました")
+        logging.info("✅ GCS 認証情報を正常にロードしました")
     except Exception as e:
-        logging.error(f"❌ GCS 認証情報のデコードに失敗: {e}")
+        logging.error(f"❌ GCS 認証情報の読み込みエラー: {str(e)}")
         credentials = None
+
+
 else:
     logging.error("❌ GCS_CREDENTIALS が設定されていません")
     credentials = None
+    
 if GCS_CREDENTIALS_BASE64:
     try:
         # Base64 デコードして JSON をロード
@@ -41,10 +44,13 @@ else:
     credentials = None
 
 # GCS クライアントの作成（認証情報があれば設定）
+
 if credentials:
     client = storage.Client(credentials=credentials)
 else:
-    client = storage.Client()
+    logging.error("❌ GCS クライアントの初期化に失敗しました。認証情報がありません")
+    client = None  # None を返すことで安全に処理をスキップさせる
+
 
 # 環境変数から設定を取得
 MASTODON_API_BASE = os.getenv("MASTODON_API_BASE", "https://mstdn.jp")  # マストドンのインスタンスURL
@@ -71,33 +77,30 @@ from google.cloud import exceptions  # 追加
 def load_posted_articles():
     """Cloud Storage から投稿済み記事リストを読み込む"""
     try:
-        client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(FILE_NAME)
 
-        try:
-            blob.reload()  # ✅ ファイルの存在チェック
+        if blob.exists():  # ファイルが存在する場合のみ処理
             data = blob.download_as_text()
             return json.loads(data)
-        except exceptions.NotFound:  # 修正
+        else:
             logging.warning(f"⚠ GCS にファイルが存在しません: {FILE_NAME}")
-            return []
+            return []  # 空のリストを返す
     except Exception as e:
         logging.error(f"❌ GCS 読み込みエラー: {str(e)}")
-        return []
-
+        return []  # エラー時も空リストを返す
 
 
 def save_posted_articles(posted_articles):
     """Cloud Storage に投稿済み記事リストを保存"""
     try:
-        client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(FILE_NAME)
-        blob.upload_from_string(json.dumps(posted_articles), content_type="application/json")
-        logging.info("✅ 投稿履歴を GCS に保存しました！")
+        blob.upload_from_string(json.dumps(posted_articles, ensure_ascii=False), content_type="application/json")
+        logging.info("✅ 投稿履歴を GCS に保存しました")
     except Exception as e:
         logging.error(f"❌ GCS 書き込みエラー: {str(e)}")
+
 
 
 from urllib.parse import urlparse, urlunparse
