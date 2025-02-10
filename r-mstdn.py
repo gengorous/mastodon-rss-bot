@@ -4,46 +4,100 @@ import requests
 import os
 import logging
 from bs4 import BeautifulSoup  # BeautifulSoupのインポートを追加
+from google.cloud import storage
+from google.oauth2 import service_account
 
-# 設定ファイルを読み込む
-with open("mastdon.json", "r", encoding="utf-8") as f:
-    config = json.load(f)
+# 環境変数から GCS の認証情報を取得（Base64 エンコードされた JSON）
+GCS_CREDENTIALS_BASE64 = os.getenv("GCS_CREDENTIALS")  # 環境変数のキーは適宜変更
+
+import base64
+
+GCS_CREDENTIALS_BASE64 = os.getenv("GCS_CREDENTIALS")
+
+if GCS_CREDENTIALS_BASE64:
+    try:
+        # Base64 をデコードして JSON に戻す
+        decoded_credentials = base64.b64decode(GCS_CREDENTIALS_BASE64).decode("utf-8")
+        credentials_info = json.loads(decoded_credentials)
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
+        logging.info("✅ GCS 認証情報をロードしました")
+    except Exception as e:
+        logging.error(f"❌ GCS 認証情報のデコードに失敗: {e}")
+        credentials = None
+else:
+    logging.error("❌ GCS_CREDENTIALS が設定されていません")
+    credentials = None
+if GCS_CREDENTIALS_BASE64:
+    try:
+        # Base64 デコードして JSON をロード
+        credentials_info = json.loads(os.environ["GCS_CREDENTIALS"])
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
+        logging.info("✅ GCS 認証情報をロードしました")
+    except Exception as e:
+        logging.error(f"❌ GCS 認証情報の読み込みに失敗: {e}")
+        credentials = None
+else:
+    logging.error("❌ GCS_CREDENTIALS が設定されていません")
+    credentials = None
+
+# GCS クライアントの作成（認証情報があれば設定）
+if credentials:
+    client = storage.Client(credentials=credentials)
+else:
+    client = storage.Client()
 
 # 環境変数から設定を取得
 MASTODON_API_BASE = os.getenv("MASTODON_API_BASE", "https://mstdn.jp")  # マストドンのインスタンスURL
 print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 
+# 設定ファイルを読み込む
+with open("mastdon.json", "r", encoding="utf-8") as f:
+    config = json.load(f)
+
 # 記事の投稿管理
 
 logging.basicConfig(level=logging.DEBUG)
-POSTED_ARTICLES_FILE = "/persistent/posted_articles.json"
+
+
+from google.cloud import storage
+
+# GCS の設定
+BUCKET_NAME = "mastdon-project"
+FILE_NAME = "posted_articles.json"
+
+# 🛠 GCS に投稿済み記事を保存・取得する関数
+from google.cloud import exceptions  # 追加
+
 def load_posted_articles():
-    """投稿済み記事のリストをファイルから読み込む"""
+    """Cloud Storage から投稿済み記事リストを読み込む"""
     try:
-        with open(POSTED_ARTICLES_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            print(f"🔍 読み込んだ投稿済み記事: {data}")  # 🔍 デバッグログ
-            return data
-    except FileNotFoundError:
-        print(f"⚠️ ファイルが見つからないため、新しく作成します: {POSTED_ARTICLES_FILE}")  # 🔍 デバッグログ
-        save_posted_articles([])  # ✅ ここで新規作成
-        return []
-    except json.JSONDecodeError:
-        print(f"⚠️ JSONエラー。空のリストを返します: {POSTED_ARTICLES_FILE}")  # 🔍 デバッグログ
+        client = storage.Client()
+        bucket = client.bucket(BUCKET_NAME)
+        blob = bucket.blob(FILE_NAME)
+
+        try:
+            blob.reload()  # ✅ ファイルの存在チェック
+            data = blob.download_as_text()
+            return json.loads(data)
+        except exceptions.NotFound:  # 修正
+            logging.warning(f"⚠ GCS にファイルが存在しません: {FILE_NAME}")
+            return []
+    except Exception as e:
+        logging.error(f"❌ GCS 読み込みエラー: {str(e)}")
         return []
 
 
 
 def save_posted_articles(posted_articles):
-    """投稿済み記事のリストを JSON ファイルに保存"""
+    """Cloud Storage に投稿済み記事リストを保存"""
     try:
-        print(f"✅ 記事URLを保存: {posted_articles}")  # 🔍 ここで保存しようとしているリストを表示
-        with open(POSTED_ARTICLES_FILE, "w", encoding="utf-8") as f:
-            json.dump(posted_articles, f, ensure_ascii=False, indent=2)
-            print(f"✅ 保存完了: {POSTED_ARTICLES_FILE}")  # 🔍 ここで保存完了のログを出力
+        client = storage.Client()
+        bucket = client.bucket(BUCKET_NAME)
+        blob = bucket.blob(FILE_NAME)
+        blob.upload_from_string(json.dumps(posted_articles), content_type="application/json")
+        logging.info("✅ 投稿履歴を GCS に保存しました！")
     except Exception as e:
-        print(f"❌ ファイル保存エラー: {e}")  # 🔍 例外が発生した場合にエラーを出力
-
+        logging.error(f"❌ GCS 書き込みエラー: {str(e)}")
 
 
 from urllib.parse import urlparse, urlunparse
@@ -157,7 +211,7 @@ def upload_media(image_url, token):
 
         print(f"🔍 マストドンアップロードレスポンスコード: {response.status_code}")  
         print(f"🔍 マストドンレスポンス内容: {response.text}")  
-        print(f"🔍 Mastodon 投稿データ: {data}")
+        print(f"🔍 Mastodon 投稿データ: {response.json()}")  # 正しくレスポンスの JSON を表示
 
         if response.status_code == 200:
             media_id = response.json().get("id")
@@ -242,5 +296,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-
+    try:
+        main()
+    except Exception as e:
+        logging.error(f"Unhandled error: {e}")
+    finally:
+        exit(0)  # 必ず正常終了コードを返す
