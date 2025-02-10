@@ -25,10 +25,6 @@ else:
         logging.error(f"❌ GCS 認証情報の読み込みエラー: {str(e)}")
         credentials = None
 
-
-else:
-    logging.error("❌ GCS_CREDENTIALS が設定されていません")
-    credentials = None
     
 if GCS_CREDENTIALS_BASE64:
     try:
