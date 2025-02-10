@@ -66,6 +66,30 @@
       "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
     },
     {
+      "name": "ero-hon",
+      "rss_url": "https://oreno-erohon.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "nijifeti",
+      "rss_url": "https://nijifeti.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "tokusenero",
+      "rss_url": "https://tokueromanga.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
       "name": "にじそく",
       "rss_url": "https://nizigami.livedoor.blog/index.rdf",
       "post_type": "mastodon",

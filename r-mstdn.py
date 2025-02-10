@@ -31,17 +31,27 @@ def save_posted_articles(posted_articles):
     with open("posted_articles.json", "w", encoding="utf-8") as f:
         json.dump(posted_articles, f, ensure_ascii=False, indent=2)
 
+from urllib.parse import urlparse, urlunparse
+
+def normalize_url(url):
+    parsed = urlparse(url)
+    return urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', '', ''))  # クエリやフラグメントを削除
+
 def check_and_update_posted_articles(article_url):
-    """記事の URL が投稿済みか確認し、新規なら記録"""
     posted_articles = load_posted_articles()
-    
-    if article_url in posted_articles:
-        logging.info(f"🟡 既に投稿済みの記事: {article_url} → スキップ")
+
+    # URLを正規化
+    normalized_url = normalize_url(article_url)
+
+    if normalized_url in posted_articles:
+        print(f"🟡 既に投稿済み: {normalized_url} → スキップ")
         return False  # 既に投稿済み
 
-    posted_articles.append(article_url)
+    # 新しい記事を記録
+    posted_articles.append(normalized_url)
     save_posted_articles(posted_articles)
-    return True  # 投稿 OK
+    return True  # 投稿OK
+
 
 
 def extract_image_url(entry):
