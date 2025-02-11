@@ -26,7 +26,7 @@ else:
         credentials = None
 
     
-if GCS_CREDENTIALS_BASE64:
+if GCS_CREDENTIALS:
     try:
         # Base64 デコードして JSON をロード
         credentials_info = json.loads(os.environ["GCS_CREDENTIALS"])
