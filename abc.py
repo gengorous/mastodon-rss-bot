@@ -1,8 +1,8 @@
-import os
+from google.auth import default
+from google.cloud import storage
 
-GCS_CREDENTIALS = os.getenv("GCS_CREDENTIALS")
-
-if not GCS_CREDENTIALS:
-    print("❌ GCS_CREDENTIALS が設定されていません！")
-else:
-    print("✅ GCS_CREDENTIALS 読み込み成功！文字数:", len(GCS_CREDENTIALS))
+creds, project = default()
+print(f"認証成功！プロジェクト: {project}")
+client = storage.Client(credentials=creds)
+buckets = list(client.list_buckets())
+print(f"バケット一覧: {buckets}")
