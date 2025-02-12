@@ -16,8 +16,9 @@ if not GCS_CREDENTIALS:
     credentials = None
 else:
     try:
-        # Base64デコードしてJSONとして解釈
+        print("🔍 環境変数 GCS_CREDENTIALS の文字数:", len(GCS_CREDENTIALS))  # デバッグ用
         decoded_credentials = base64.b64decode(GCS_CREDENTIALS).decode("utf-8")
+        print("✅ デコード成功！JSONの内容:\n", decoded_credentials)  # デバッグ用
         credentials_info = json.loads(decoded_credentials)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
         logging.info("✅ GCS 認証情報を正常にロードしました")
@@ -25,19 +26,6 @@ else:
         logging.error(f"❌ GCS 認証情報の読み込みエラー: {str(e)}")
         credentials = None
 
-    
-if GCS_CREDENTIALS:
-    try:
-        # Base64 デコードして JSON をロード
-        credentials_info = json.loads(os.environ["GCS_CREDENTIALS"])
-        credentials = service_account.Credentials.from_service_account_info(credentials_info)
-        logging.info("✅ GCS 認証情報をロードしました")
-    except Exception as e:
-        logging.error(f"❌ GCS 認証情報の読み込みに失敗: {e}")
-        credentials = None
-else:
-    logging.error("❌ GCS_CREDENTIALS が設定されていません")
-    credentials = None
 
 # GCS クライアントの作成（認証情報があれば設定）
 
