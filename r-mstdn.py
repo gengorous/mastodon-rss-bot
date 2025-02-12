@@ -3,10 +3,13 @@ import feedparser
 import requests
 import os
 import logging
-from bs4 import BeautifulSoup  # BeautifulSoupのインポートを追加
+from bs4 import BeautifulSoup 
 from google.cloud import storage
 from google.oauth2 import service_account
 import base64
+
+# ログの設定
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # GCS 認証情報のロード
 GCS_CREDENTIALS = os.getenv("GCS_CREDENTIALS")
@@ -16,24 +19,31 @@ if not GCS_CREDENTIALS:
     credentials = None
 else:
     try:
-        print("🔍 環境変数 GCS_CREDENTIALS の文字数:", len(GCS_CREDENTIALS))  # デバッグ用
         decoded_credentials = base64.b64decode(GCS_CREDENTIALS).decode("utf-8")
-        print("✅ デコード成功！JSONの内容:\n", decoded_credentials)  # デバッグ用
         credentials_info = json.loads(decoded_credentials)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
         logging.info("✅ GCS 認証情報を正常にロードしました")
+    except json.JSONDecodeError:
+        logging.error("❌ GCS_CREDENTIALS のデコードに失敗しました（JSON 形式が壊れている可能性）")
+        credentials = None
+    except base64.binascii.Error:
+        logging.error("❌ GCS_CREDENTIALS の Base64 デコードに失敗しました（データが壊れている可能性）")
+        credentials = None
     except Exception as e:
         logging.error(f"❌ GCS 認証情報の読み込みエラー: {str(e)}")
         credentials = None
 
-
-# GCS クライアントの作成（認証情報があれば設定）
-
+# GCS クライアントの作成
 if credentials:
-    client = storage.Client(credentials=credentials)
+    try:
+        client = storage.Client(credentials=credentials)
+        logging.info("✅ GCS クライアントを正常に初期化しました")
+    except Exception as e:
+        logging.error(f"❌ GCS クライアントの初期化に失敗しました: {str(e)}")
+        client = None
 else:
-    logging.error("❌ GCS クライアントの初期化に失敗しました。認証情報がありません")
-    client = None  # None を返すことで安全に処理をスキップさせる
+    logging.error("❌ GCS クライアントの初期化に失敗しました（認証情報がありません）")
+    client = None
 
 
 # 環境変数から設定を取得
