@@ -2,7 +2,7 @@
 FROM python:3.11
 
 # 作業ディレクトリを設定
-WORKDIR /app
+WORKDIR /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot
 
 # 必要なファイルをコンテナ内にコピー
 COPY start.sh /app/start.sh
@@ -12,7 +12,7 @@ COPY . /app/
 RUN chmod +x /app/start.sh
 
 # コンテナ起動時に start.sh を実行
-CMD ["/bin/bash", "/app/start.sh"]
+CMD ["/bin/bash", "/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh"]
 
 # 必要ファイルをコピー
 COPY requirements.txt ./  
