@@ -13,6 +13,9 @@ COPY requirements.txt ./
 COPY mastdon.py ./  
 COPY mastdon.json ./  
 COPY key.json /app/key.json
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+CMD ["/bin/bash", "/app/start.sh"]
 
 
 # 依存ライブラリをインストール
