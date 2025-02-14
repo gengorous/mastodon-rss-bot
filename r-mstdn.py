@@ -249,7 +249,7 @@ def post_to_mastodon(status, mastodon_url, token, media_id=None):
         headers=headers,
         data=data,
         allow_redirects=False,  # リダイレクトを防ぐ
-        verify=False 
+        verify=True 
     )
 
     print(f"🔍 マストドン投稿レスポンスコード: {response.status_code}")
