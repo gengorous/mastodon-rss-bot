@@ -13,11 +13,12 @@ RUN python -m venv /app/venv && \
     /app/venv/bin/pip install -r /app/requirements.txt
 
 # コンテナ起動時に start.sh を実行
-CMD ["/bin/bash", "/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh"]
+CMD ["/bin/sh"]
+
 
 # 必要ファイルをコピー
 COPY requirements.txt /app/requirements.txt 
-COPY mastdon.py ./  
+COPY r-mstdn.py /app/  
 COPY mastdon.json ./  
 COPY key.json /app/key.json
 
