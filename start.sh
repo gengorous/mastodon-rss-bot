@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# デバッグ用ログ出力
+exec 2> /tmp/error_log.txt  # 標準エラーをログに記録
+
+echo "🐍 Running start.sh" > /tmp/debug_log.txt
+pwd >> /tmp/debug_log.txt
+ls -l /app/ >> /tmp/debug_log.txt
+ls -l /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/ >> /tmp/debug_log.txt
+echo "PATH: $PATH" >> /tmp/debug_log.txt
+which bash >> /tmp/debug_log.txt
+ls -l $(which bash) >> /tmp/debug_log.txt
+
 echo "🔧 GCS 認証情報をセットアップ中..."
 python setup_gcs_credentials.py
 
