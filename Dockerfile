@@ -9,17 +9,17 @@ COPY start.sh /app/start.sh
 COPY . /app/
 
 # start.sh に実行権限を付与
-RUN chmod +x /app/start.sh
+RUN python -m venv /app/venv && \
+    /app/venv/bin/pip install -r /app/requirements.txt
 
 # コンテナ起動時に start.sh を実行
 CMD ["/bin/bash", "/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh"]
 
 # 必要ファイルをコピー
-COPY requirements.txt ./  
+COPY requirements.txt /app/requirements.txt 
 COPY mastdon.py ./  
 COPY mastdon.json ./  
 COPY key.json /app/key.json
-
 
 # 依存ライブラリをインストール
 RUN pip install --no-cache-dir -r requirements.txt
