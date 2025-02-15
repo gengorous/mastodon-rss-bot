@@ -8,6 +8,9 @@ which pip3
 python3 --version
 pip3 --version
 
+echo "🐍 Current directory: $(pwd)"
+ls -l $(pwd)
+
 echo "🐍 Running start.sh" > /tmp/debug_log.txt
 pwd >> /tmp/debug_log.txt
 ls -l /app/ >> /tmp/debug_log.txt
