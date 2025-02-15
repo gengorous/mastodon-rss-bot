@@ -22,7 +22,7 @@ RUN python -m venv /app/venv && \
 RUN chmod +x /opt/render/project/src/start.sh
 
 # 必要ファイルをコピー
-COPY requirements.txt /app/requirements.txt 
+COPY requirements.txt /opt/render/project/src/requirements.txt
 COPY r-mstdn.py /app/  
 COPY mastdon.json ./  
 COPY key.json /app/key.json
