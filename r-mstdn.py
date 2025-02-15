@@ -71,18 +71,25 @@ from google.cloud import exceptions  # 追加
 def load_posted_articles():
     """Cloud Storage から投稿済み記事リストを読み込む"""
     try:
+        if not BUCKET_NAME:
+            raise ValueError("❌ `BUCKET_NAME` が設定されていません！")
+
+        print(f"🔍 GCS から `{FILE_NAME}` を読み込みます...")
+
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(FILE_NAME)
 
         if blob.exists():  # ファイルが存在する場合のみ処理
             data = blob.download_as_text()
+            print(f"✅ GCS から取得した `posted_articles.json`: {data}")  # 🔍 デバッグ用
             return json.loads(data)
         else:
-            logging.warning(f"⚠ GCS にファイルが存在しません: {FILE_NAME}")
+            print(f"⚠ GCS にファイルが存在しません: {FILE_NAME}")
             return []  # 空のリストを返す
     except Exception as e:
-        logging.error(f"❌ GCS 読み込みエラー: {str(e)}")
+        print(f"❌ GCS 読み込みエラー: {str(e)}")  # 🔍 デバッグ用
         return []  # エラー時も空リストを返す
+
 
 
 def save_posted_articles(posted_articles):
@@ -90,11 +97,13 @@ def save_posted_articles(posted_articles):
     try:
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(FILE_NAME)
-        blob.upload_from_string(json.dumps(posted_articles, ensure_ascii=False), content_type="application/json")
-        logging.info("✅ 投稿履歴を GCS に保存しました")
-    except Exception as e:
-        logging.error(f"❌ GCS 書き込みエラー: {str(e)}")
+        json_data = json.dumps(posted_articles, ensure_ascii=False)
 
+        print(f"📝 GCS に `posted_articles.json` を保存: {json_data}")  # 🔍 デバッグ用
+        blob.upload_from_string(json_data, content_type="application/json")
+        print("✅ 投稿履歴を GCS に保存しました")
+    except Exception as e:
+        print(f"❌ GCS 書き込みエラー: {str(e)}")  # 🔍 デバッグ用
 
 
 from urllib.parse import urlparse, urlunparse
@@ -117,7 +126,9 @@ def check_and_update_posted_articles(article_url):
     # 新しい記事を記録
     posted_articles.append(normalized_url)
     save_posted_articles(posted_articles)
+    print(f"✅ 新しい記事を投稿済みに追加: {normalized_url}")
     return True  # 投稿OK
+
 
 
 
@@ -268,14 +279,20 @@ def post_to_mastodon(status, mastodon_url, token, media_id=None):
 def main():
     for site in config["sites"]:
         print(f"処理中: {site['name']}")
-        
+
         entry, image_url = fetch_latest_entry(site["rss_url"])  # ここで `image_url` を取得
-        
+
         if entry:
+            print(f"🔍 記事URL: {entry.link}")
+
             # 投稿済みチェック
-            if not check_and_update_posted_articles(entry.link):
+            is_new = check_and_update_posted_articles(entry.link)
+            print(f"🔄 投稿済みチェック結果: {is_new}")  # 🔍 デバッグ用
+
+            if not is_new:
+                print(f"⏩ 既に投稿済みの記事をスキップ: {entry.link}")
                 continue  # 投稿済みならスキップ
-            
+
             # 画像がある場合のみ取得＆リサイズ処理を実行
             resized_image_data = None
             if image_url:
@@ -289,6 +306,7 @@ def main():
             if resized_image_data:
                 media_id = upload_media(image_url, site["mastodon_token"])  # 画像アップロード
             post_to_mastodon(status, site["mastodon_url"], site["mastodon_token"], media_id)
+
 
 
 
