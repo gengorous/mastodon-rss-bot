@@ -1,18 +1,19 @@
 #!/bin/bash
 
 # デバッグ用ログ出力
-exec 2> /tmp/error_log.txt  # 標準エラーをログに記録
+exec 2> /opt/render/project/src/error_log.txt  # エラーログも保存
 
-echo "🐍 Current directory: $(pwd)" > /tmp/debug_log.txt
-ls -l $(pwd) >> /tmp/debug_log.txt
+echo "🐍 Current directory: $(pwd)" > /opt/render/project/src/debug_log.txt
+ls -l $(pwd) >> /opt/render/project/src/debug_log.txt
 
-echo "🐍 PATH: $PATH" >> /tmp/debug_log.txt
-which python3 >> /tmp/debug_log.txt
-python3 --version >> /tmp/debug_log.txt
-pip3 --version >> /tmp/debug_log.txt
+echo "🐍 PATH: $PATH" >> /opt/render/project/src/debug_log.txt
+which python3 >> /opt/render/project/src/debug_log.txt
+python3 --version >> /opt/render/project/src/debug_log.txt
+pip3 --version >> /opt/render/project/src/debug_log.txt
 
-echo "🐍 環境変数" >> /tmp/debug_log.txt
-env >> /tmp/debug_log.txt
+echo "🐍 環境変数" >> /opt/render/project/src/debug_log.txt
+env >> /opt/render/project/src/debug_log.txt
+
 
 echo "🔧 GCS 認証情報をセットアップ中..."
 python3 setup_gcs_credentials.py
