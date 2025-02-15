@@ -5,8 +5,9 @@ FROM python:3.11
 WORKDIR /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot
 
 # 必要なファイルをコンテナ内にコピー
-COPY start.sh /app/start.sh
-COPY . /app/
+COPY start.sh /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh
+COPY . /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/
+
 
 # start.sh に実行権限を付与
 RUN python -m venv /app/venv && \
