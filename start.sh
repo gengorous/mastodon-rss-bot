@@ -32,6 +32,10 @@ fi
 echo "🚀 Flask サーバーを起動中..."
 python -m waitress --listen=0.0.0.0:8080 --threads=1 mastdon:app &
 
+# `r-mstdn.py` を実行する前に `feedparser` の確認
+echo "🔍 インストール済みの feedparser を確認"
+pip3 list | grep feedparser
+
 # `r-mstdn.py` を実行
 echo "🚀 r-mstdn.py を起動中..."
 python3 r-mstdn.py
