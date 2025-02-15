@@ -2,12 +2,14 @@
 FROM python:3.11
 
 # 作業ディレクトリを設定
-WORKDIR /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot
+WORKDIR /app
 
 # 必要なファイルをコンテナ内にコピー
-COPY start.sh /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh
-COPY . /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/
 
+COPY . /app/
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+RUN ls -l /app/
 
 # start.sh に実行権限を付与
 RUN python -m venv /app/venv && \
