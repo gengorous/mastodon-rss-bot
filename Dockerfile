@@ -2,33 +2,28 @@
 FROM python:3.11
 
 # 作業ディレクトリを設定
-WORKDIR /app
+WORKDIR /opt/render/project/src
 
+# 依存ファイルを先にコピーしてキャッシュを活用
+COPY requirements.txt /opt/render/project/src/requirements.txt
+
+# 仮想環境を作成し、必要なライブラリをインストール
+RUN python -m venv /opt/render/project/src/venv && \
+    /opt/render/project/src/venv/bin/pip install --no-cache-dir -r /opt/render/project/src/requirements.txt
+    
 # 必要なファイルをコンテナ内にコピー
-
-COPY . /app/
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-RUN ls -l /app/
+COPY . /opt/render/project/src/
 
 # start.sh に実行権限を付与
 RUN python -m venv /app/venv && \
     /app/venv/bin/pip install -r /app/requirements.txt
 
-# コンテナ起動時に start.sh を実行
-CMD ["/bin/sh"]
-
+# start.sh に実行権限を付与
+RUN chmod +x /opt/render/project/src/start.sh
 
 # 必要ファイルをコピー
 COPY requirements.txt /app/requirements.txt 
 COPY r-mstdn.py /app/  
 COPY mastdon.json ./  
 COPY key.json /app/key.json
-
-# 依存ライブラリをインストール
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Gunicorn で Flask アプリを起動
-CMD ["python", "-m", "waitress", "--listen=0.0.0.0:8080", "--threads=1", "mastdon:app"]
-
 
