@@ -26,5 +26,5 @@ COPY service-account.json /etc/secrets/service-account.json
 ENV GOOGLE_APPLICATION_CREDENTIALS="/etc/secrets/service-account.json"
 
 # コンテナ起動時のコマンド
-CMD ["/bin/bash", "/opt/render/project/src/start.sh"]
+CMD ["/bin/bash", "/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh"]
 
