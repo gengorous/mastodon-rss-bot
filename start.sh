@@ -29,15 +29,18 @@ else
     source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
 fi
 
-# Flask サーバーを `waitress` で起動（バックグラウンドで実行）
+echo "🐍 Python 実行ファイル: $(which python3)"
+python3 --version
+pip list | grep google
+
+# Flask サーバーをバックグラウンドで起動
 echo "🚀 Flask サーバーを起動中..."
 python -m waitress --listen=0.0.0.0:8080 --threads=1 mastdon:app &
 
-# `r-mstdn.py` を実行する前に `feedparser` の確認
-echo "🔍 インストール済みの feedparser を確認"
-pip3 list | grep feedparser
-
-# `r-mstdn.py` を実行
+# `r-mstdn.py` を非同期で実行（バックグラウンド実行に変更）
 echo "🚀 r-mstdn.py を起動中..."
-python3 r-mstdn.py
+python3 r-mstdn.py &
 
+# 全てのバックグラウンドジョブを待機
+wait
+echo "🛑 全プロセスが終了しました。"

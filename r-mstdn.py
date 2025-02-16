@@ -276,40 +276,23 @@ def main():
     for site in config["sites"]:
         print(f"処理中: {site['name']}")
 
-        entry, image_url = fetch_latest_entry(site["rss_url"])  # ここで `image_url` を取得
+        entry, image_url = fetch_latest_entry(site["rss_url"])
 
         if entry:
-            print(f"🔍 記事URL: {entry.link}")
+            if not check_and_update_posted_articles(entry.link):
+                continue  # 既に投稿済みならスキップ
 
-            # 投稿済みチェック
-            is_new = check_and_update_posted_articles(entry.link)
-            print(f"🔄 投稿済みチェック結果: {is_new}")  # 🔍 デバッグ用
-
-            if not is_new:
-                print(f"⏩ 既に投稿済みの記事をスキップ: {entry.link}")
-                continue  # 投稿済みならスキップ
-
-            # 画像がある場合のみ取得＆リサイズ処理を実行
             resized_image_data = None
             if image_url:
                 response = requests.get(image_url)
                 if response.status_code == 200:
                     resized_image_data = resize_image(response.content)
 
-            # 新しい記事の投稿
             status = f"{site['title']}\n{entry.title}\n{entry.link}"
             media_id = None
             if resized_image_data:
                 media_id = upload_media(image_url, site["mastodon_token"])  # 画像アップロード
             post_to_mastodon(status, site["mastodon_url"], site["mastodon_token"], media_id)
 
-
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        logging.error(f"Unhandled error: {e}")
-    finally:
-        exit(0)  # 必ず正常終了コードを返す
+    print("✅ 全サイトの処理が完了しました！")  # ← 追加
+    exit(0)  # ちゃんと終了させる！
