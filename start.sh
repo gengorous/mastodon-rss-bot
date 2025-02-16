@@ -22,11 +22,11 @@ python3 setup_gcs_credentials.py
 if [ ! -d "/opt/render/project/src/venv" ]; then
     echo "⚠ 仮想環境が見つかりません！作成します..."
     python3 -m venv /opt/render/project/src/venv
-    source /opt/render/project/src/venv/bin/activate
+    source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
     pip3 install -r /opt/render/project/src/requirements.txt
 else
     echo "🐍 仮想環境をアクティブ化..."
-    source /opt/render/project/src/venv/bin/activate
+    source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
 fi
 
 # Flask サーバーを `waitress` で起動（バックグラウンドで実行）
