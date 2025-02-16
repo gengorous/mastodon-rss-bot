@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ログファイルの設定
-DEBUG_LOG="/opt/render/project/src/debug_log.txt"
-ERROR_LOG="/opt/render/project/src/error_log.txt"
+DEBUG_LOG="/opt/render/project/go/src/debug_log.txt"
+ERROR_LOG="/opt/render/project/go/src/error_log.txt"
 
 # エラーログも保存
 exec 2>> $ERROR_LOG  
@@ -22,11 +22,11 @@ echo "🔧 GCS 認証情報をセットアップ中..."
 python3 setup_gcs_credentials.py
 
 # 仮想環境 (`venv`) の確認＆セットアップ
-if [ ! -d "/opt/render/project/src/venv" ]; then
+if [ ! -d "/opt/render/project/go/src/venv" ]; then
     echo "⚠ 仮想環境が見つかりません！作成します..."
-    python3 -m venv /opt/render/project/src/venv
+    python3 -m venv /opt/render/project/go/src/venv
     source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
-    pip3 install -r /opt/render/project/src/requirements.txt
+    pip3 install -r /opt/render/project/go/src/requirements.txt
 else
     echo "🐍 仮想環境をアクティブ化..."
     source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
