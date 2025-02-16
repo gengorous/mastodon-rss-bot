@@ -1,0 +1,102 @@
+{
+  "sites": [
+    {
+      "name": "コミックナタリー",
+      "rss_url": "https://natalie.mu/comic/feed/news",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "百合ナビ",
+      "rss_url": "https://yurinavi.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "リスアニ",
+      "rss_url": "https://www.lisani.jp/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "格ゲーチェッカー",
+      "rss_url": "https://kakuge-checker.com/topic/rss",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "あだまん",
+      "rss_url": "https://adaman-ero.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "きも男",
+      "rss_url": "https://kimootoko.net/archives/category/%E5%B1%9E%E6%80%A7%E5%88%A5/%E5%82%AC%E7%9C%A0%E3%83%BB%E6%B4%97%E8%84%B3%E3%83%BB%E8%B6%85%E8%83%BD%E5%8A%9B/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+     
+    },
+    {
+      "name": "parayuri",
+      "rss_url": "https://paradiseyuri.tumblr.com/rss",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "genshinleak",
+      "rss_url": "https://genshin-leak.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "ero-hon",
+      "rss_url": "https://oreno-erohon.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "nijifeti",
+      "rss_url": "https://nijifeti.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "tokusenero",
+      "rss_url": "https://tokueromanga.com/feed",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"
+    },
+    {
+      "name": "にじそく",
+      "rss_url": "https://nizigami.livedoor.blog/index.rdf",
+      "post_type": "mastodon",
+      "mastodon_url": "https://mstdn.jp/api/v1/statuses",
+      "title": " ",
+      "mastodon_token": "Nv-kRLghxYheOzFlDxamE9TPW0_EclFdqIxh1JtUke0"       
+    }
+  ]
+  
+}

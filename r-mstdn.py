@@ -51,15 +51,13 @@ MASTODON_API_BASE = os.getenv("MASTODON_API_BASE", "https://mstdn.jp")  # マス
 print(f"🔍 現在の MASTODON_API_BASE: {MASTODON_API_BASE}")
 
 # 設定ファイルを読み込む
-with open("mastdon.json", "r", encoding="utf-8") as f:
+with open("mastdn.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 # 記事の投稿管理
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-from google.cloud import storage
 
 # GCS の設定
 BUCKET_NAME = "mastdon-project"
