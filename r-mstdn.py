@@ -95,15 +95,14 @@ def load_posted_articles():
 def save_posted_articles(posted_articles):
     """Cloud Storage に投稿済み記事リストを保存"""
     try:
+        print(f"📝 GCS に保存: {posted_articles}")  # ← 追加
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(FILE_NAME)
-        json_data = json.dumps(posted_articles, ensure_ascii=False)
-
-        print(f"📝 GCS に `posted_articles.json` を保存: {json_data}")  # 🔍 デバッグ用
-        blob.upload_from_string(json_data, content_type="application/json")
-        print("✅ 投稿履歴を GCS に保存しました")
+        blob.upload_from_string(json.dumps(posted_articles, ensure_ascii=False), content_type="application/json")
+        logging.info("✅ 投稿履歴を GCS に保存しました")
     except Exception as e:
-        print(f"❌ GCS 書き込みエラー: {str(e)}")  # 🔍 デバッグ用
+        logging.error(f"❌ GCS 書き込みエラー: {str(e)}")
+
 
 
 from urllib.parse import urlparse, urlunparse
@@ -124,13 +123,10 @@ def check_and_update_posted_articles(article_url):
         return False  # 既に投稿済み
 
     # 新しい記事を記録
+    print(f"📝 新しい記事を追加: {normalized_url}")  # ← 追加
     posted_articles.append(normalized_url)
     save_posted_articles(posted_articles)
-    print(f"✅ 新しい記事を投稿済みに追加: {normalized_url}")
     return True  # 投稿OK
-
-
-
 
 def extract_image_url(entry):
     """記事の説明やサマリーから画像URLを抽出"""
