@@ -1,30 +1,29 @@
 # ベースイメージ
 FROM python:3.11
 
-# 作業ディレクトリを正しいパスに設定
-WORKDIR /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot
+# 作業ディレクトリを設定
+WORKDIR /opt/render/project/src
 
-# 依存ファイルを先にコピーしてキャッシュを活用
-COPY requirements.txt /opt/render/project/src/requirements.txt
 
-# 仮想環境を作成し、必要なライブラリをインストール
-RUN python -m venv /opt/render/project/src/venv && \
-    /opt/render/project/src/venv/bin/pip install --no-cache-dir -r /opt/render/project/src/requirements.txt
-    
-# 必要なファイルをコンテナ内にコピー
-COPY . /opt/render/project/src/
+# すべてのファイルをコンテナにコピー
+COPY start.sh /opt/render/project/src/start.sh
 
-# start.sh に実行権限を付与
-RUN python -m venv /app/venv && \
-    /app/venv/bin/pip install -r /app/requirements.txt
 
-# start.sh に実行権限を付与
-RUN chmod +x /opt/render/project/src/start.sh
+# 仮想環境を作成 & 必要なライブラリをインストール
+RUN python -m venv venv && \
+    venv/bin/pip install --upgrade pip && \
+    venv/bin/pip install --no-cache-dir -r requirements.txt
 
-# 必要ファイルをコピー
-COPY requirements.txt /opt/render/project/src/requirements.txt
-COPY r-mstdn.py /app/  
-COPY mastdon.json ./  
+# `venv` をデフォルトの `python3` & `pip3` に設定
+ENV PATH="/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin:$PATH"
+
+# `start.sh` に実行権限を付与
+RUN chmod +x start.sh
+
+# GCS の認証情報をセット
 COPY service-account.json /etc/secrets/service-account.json
 ENV GOOGLE_APPLICATION_CREDENTIALS="/etc/secrets/service-account.json"
+
+# コンテナ起動時のコマンド
+CMD ["/bin/bash", "/opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/start.sh"]
 
