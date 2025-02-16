@@ -1,19 +1,22 @@
 #!/bin/bash
 
-# デバッグ用ログ出力
-exec 2> /opt/render/project/src/error_log.txt  # エラーログも保存
+# ログファイルの設定
+DEBUG_LOG="/opt/render/project/src/debug_log.txt"
+ERROR_LOG="/opt/render/project/src/error_log.txt"
 
-echo "🐍 Current directory: $(pwd)" > /opt/render/project/src/debug_log.txt
-ls -l $(pwd) >> /opt/render/project/src/debug_log.txt
+# エラーログも保存
+exec 2>> $ERROR_LOG  
 
-echo "🐍 PATH: $PATH" >> /opt/render/project/src/debug_log.txt
-which python3 >> /opt/render/project/src/debug_log.txt
-python3 --version >> /opt/render/project/src/debug_log.txt
-pip3 --version >> /opt/render/project/src/debug_log.txt
+echo "🐍 Current directory: $(pwd)" > $DEBUG_LOG
+ls -l $(pwd) >> $DEBUG_LOG
 
-echo "🐍 環境変数" >> /opt/render/project/src/debug_log.txt
-env >> /opt/render/project/src/debug_log.txt
+echo "🐍 PATH: $PATH" >> $DEBUG_LOG
+which python3 >> $DEBUG_LOG
+python3 --version >> $DEBUG_LOG
+pip3 --version >> $DEBUG_LOG
 
+echo "🐍 環境変数" >> $DEBUG_LOG
+env >> $DEBUG_LOG
 
 echo "🔧 GCS 認証情報をセットアップ中..."
 python3 setup_gcs_credentials.py
@@ -29,18 +32,19 @@ else
     source /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot/venv/bin/activate
 fi
 
-echo "🐍 Python 実行ファイル: $(which python3)"
-python3 --version
-pip list | grep google
+echo "🐍 Python 実行ファイル: $(which python3)" | tee -a $DEBUG_LOG
+python3 --version | tee -a $DEBUG_LOG
+pip list | grep google | tee -a $DEBUG_LOG
 
-# Flask サーバーをバックグラウンドで起動
-echo "🚀 Flask サーバーを起動中..."
-python -m waitress --listen=0.0.0.0:8080 --threads=1 mastdon:app &
+# Flask サーバーをバックグラウンドで起動しログを記録
+echo "🚀 Flask サーバーを起動中..." | tee -a $DEBUG_LOG
+python -m waitress --listen=0.0.0.0:8080 --threads=1 mastdon:app >> $DEBUG_LOG 2>> $ERROR_LOG &
 
-# `r-mstdn.py` を非同期で実行（バックグラウンド実行に変更）
-echo "🚀 r-mstdn.py を起動中..."
-python3 r-mstdn.py &
+# `r-mstdn.py` をバックグラウンドで実行しログを記録
+echo "🚀 r-mstdn.py を起動中..." | tee -a $DEBUG_LOG
+python3 r-mstdn.py >> $DEBUG_LOG 2>> $ERROR_LOG &
 
 # 全てのバックグラウンドジョブを待機
 wait
-echo "🛑 全プロセスが終了しました。"
+echo "🛑 全プロセスが終了しました。" | tee -a $DEBUG_LOG
+
