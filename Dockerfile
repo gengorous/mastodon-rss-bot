@@ -1,8 +1,8 @@
 # ベースイメージ
 FROM python:3.11
 
-# 作業ディレクトリを設定
-WORKDIR /opt/render/project/src
+# 作業ディレクトリを正しいパスに設定
+WORKDIR /opt/render/project/go/src/github.com/gengorous/mastodon-rss-bot
 
 # 依存ファイルを先にコピーしてキャッシュを活用
 COPY requirements.txt /opt/render/project/src/requirements.txt
@@ -25,5 +25,6 @@ RUN chmod +x /opt/render/project/src/start.sh
 COPY requirements.txt /opt/render/project/src/requirements.txt
 COPY r-mstdn.py /app/  
 COPY mastdon.json ./  
-COPY key.json /app/key.json
+COPY service-account.json /etc/secrets/service-account.json
+ENV GOOGLE_APPLICATION_CREDENTIALS="/etc/secrets/service-account.json"
 
